@@ -55,7 +55,8 @@ Ch 1–4 around 21 Oct 2026, who is also learning JavaScript — so code must st
   `src/scenes/Versus.js` (lobby, duel, result), `src/systems/versus.js` (the rule book: seeded questions,
   cleaning of whatever the other browser sends, the verdict), `src/systems/net.js` (PeerJS link, loaded on demand).
 - **Tests now:** 560 unit tests, 6 Playwright tests + 1 that needs `ONLINE=1`. All passing, zero console errors.
-- **Pushed and deployed?** Check with `git log origin/main..main` (empty = pushed) and the live URL.
+- **Pushed and deployed** on 7 Oct (the owner said yes in chat): `main` is at `161a695` plus this note, and
+  the live site was checked to boot and start a practice duel from that build.
 
 Earlier:
 
