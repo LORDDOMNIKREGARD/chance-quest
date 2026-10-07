@@ -7,6 +7,7 @@ import { state, cq } from '../systems/save.js';
 import { content } from '../systems/content.js';
 import { music } from '../audio/sfx.js';
 import { FONT } from '../encounters/kit.js';
+import { BUILT_CHAPTERS } from '../encounters/index.js';
 
 // One screen, 20×11 tiles.  T tree · ~ water · = road · 1-8 region gates · . grass
 const MAP = [
@@ -84,9 +85,9 @@ export default class Overworld extends Phaser.Scene {
     if (!unlocked(ch)) {
       stepBack();
       say('Gate guard', `The road to ${region.name} is sealed. Defeat the boss of ${content.regions[ch - 2].name} first.`);
-    } else if (ch > 1) {
-      stepBack(); // TODO(M2): remove once Ch 2–4 scene templates exist
-      say('Hoot', `${region.name} is still being built — it arrives with the next milestone. Tallyburg's Echoes and bounties are waiting meanwhile!`);
+    } else if (ch > BUILT_CHAPTERS) {
+      stepBack();
+      say('Hoot', `${region.name} is still being built - it arrives with the next milestone. Echoes and bounties are waiting in the towns behind you!`);
     } else {
       this.scene.start('Region', { ch });
     }

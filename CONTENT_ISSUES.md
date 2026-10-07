@@ -24,6 +24,20 @@ No answer value was changed. Everything below is about how the content is stored
   therefore also shows "-".
 - Other symbols the font lacks (→ ≥ ≤ ⇔ ½ ² ₁ √) fall back to a system font. Readable, but thinner than the rest.
 
+## Milestone 2: a second, independent check of Ch 2–4
+
+- Each of the 102 probability and expectation phases in Ch 2–4 now has a simulation that plays the story
+  itself (shuffling, rolling, drawing) and knows nothing about `f` or `answer`. 30,000 runs of each agree
+  with the stored answer. So for these chapters the answers are confirmed by Monte Carlo as well as by the
+  formula check. **No content error was found.**
+- `c4-poisson-approx`, phase 1 asks for the *Poisson approximation* (0.18045). Its Run step simulates the
+  real 400-ticket lottery, whose true value is the binomial 0.18090, so the simulation lands a hair off the
+  asked-for answer by design. The difference (0.0005) is far smaller than simulation noise.
+- `c4-typos` is simulated as 500 letters per page, each with a tiny chance of a slip, rather than by sampling
+  a Poisson directly. The two differ by about 0.0001.
+- Some probability asks do not start with "P(" (both `c2-keys` asks put a sentence first). The game decides
+  what gets Predict → Run → Compare from the simulation list, not from the wording, so these are covered.
+
 ## Things to know about the content itself
 
 - `c1-lattice`: `R` and `U` vary on an Echo but the well stays at (2 right, 1 up). Always valid for the given
@@ -32,5 +46,5 @@ No answer value was changed. Everything below is about how the content is stored
 - `c4-third-win`: the story says "{r}rd win", which only reads right while r = 3 (r is not varied, so it holds).
 - Encounters with an empty `vary` (e.g. `c1-banner-letters`, `c1-balanced-committee`) return as Echoes with the
   same numbers, so an Echo of those tests recall of the answer more than the method.
-- Three encounters have a `choices` phase (`c2-intransitive`, `c4-commodity`, `c6-table`). Chapter 1 has none;
-  the walk-to-object mechanic for them is Milestone 2 work.
+- Three encounters have a `choices` phase (`c2-intransitive`, `c4-commodity`, `c6-table`). The first two are
+  playable as pedestals you walk to; `c6-table` arrives with Chapter 6.

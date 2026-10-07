@@ -50,6 +50,7 @@ export function kit(scene) {
       const show = () => view.setText(`${label}: ${seen.size}`);
       return {
         seen,
+        view,
         reset() { seen.clear(); show(); },
         see(signature) {
           if (seen.has(signature)) return false;
@@ -68,9 +69,7 @@ export function kit(scene) {
           onComplete: () => {
             item.destroy();
             burst(scene, target.x, target.y, ok ? 0xffec27 : 0xff004d);
-            scene.cameras.main.shake(ok ? 120 : 260, ok ? 0.004 : 0.012);
-            sfx(ok ? 'ok' : 'bad');
-            scene.time.delayedCall(450, resolve);
+            scene.time.delayedCall(350, resolve); // the scene then plays the sound and the consequence
           },
         });
       });

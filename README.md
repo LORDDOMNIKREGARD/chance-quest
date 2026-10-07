@@ -6,8 +6,11 @@ treasure to split. You play with a small version of it first, then forge the exa
 
 **Play it:** https://lorddomnikregard.github.io/chance-quest/
 
-Milestone 1 is playable: the engine and Tallyburg (Chapter 1, counting). See [PLAYTEST.md](PLAYTEST.md) for
-what to try and what is still to come.
+Chapters 1–4 are playable: Tallyburg (counting), Venn Marshes (axioms), Bayesport (conditional probability)
+and Fortune Bazaar (discrete random variables). Chapters 5–8 are still to come. See
+[PLAYTEST.md](PLAYTEST.md) for what to try.
+
+Your progress saves itself in your browser. Use Menu → Export save to back it up or move it to another device.
 
 ## Run it locally
 

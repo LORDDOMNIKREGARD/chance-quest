@@ -78,3 +78,56 @@ test('new game → Tallyburg → forge right and wrong → Grimoire export', asy
   // 6. Nothing went wrong along the way.
   expect(errors).toEqual([]);
 });
+
+test('Venn Marshes: Predict → Run → Compare, then a walk-to choice', async ({ page }) => {
+  const errors = [];
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('pageerror', error => errors.push(String(error)));
+
+  // A journey that has beaten the first boss, standing at the Trickster's door (last house in Venn Marshes).
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('chance-quest-save-v1')) {
+      localStorage.setItem('chance-quest-save-v1', JSON.stringify({ v: 1, solved: {}, bosses: [1], where: { scene: 'Region', ch: 2, x: 1528 } }));
+    }
+  });
+  await page.goto('/');
+  await page.click('#continue');
+  await page.waitForFunction(() => window.__cq.near === 'c2-intransitive');
+  await page.keyboard.press('e');
+  await page.waitForFunction(() => window.__cq.scene === 'Encounter');
+  await talk(page);
+
+  // Predict: the forge is not offered until a gut estimate has been poured.
+  await expect(page.locator('#predict')).toBeVisible();
+  await expect(page.locator('#forge-open')).toHaveCount(0);
+  await page.click('#predict');
+  await page.locator('#flask-slider').evaluate(slider => { slider.value = 0.6; slider.dispatchEvent(new Event('input')); });
+  await expect(page.locator('#flask-reading')).toHaveText('0.6');
+  await page.click('#flask-pour');
+
+  // Run: two thousand honest rolls of the trickster's dice land near 4/9 without being told the answer.
+  await page.waitForFunction(() => window.__cq.event === 'run-done', null, { timeout: 20_000 });
+  const summary = await page.locator('#ask-prc').innerText();
+  const estimate = Number(/honest runs: ([\d.]+)/.exec(summary)[1]);
+  expect(Math.abs(estimate - 4 / 9)).toBeLessThan(0.05);
+
+  // Compare: forge the exact value and see all three side by side.
+  await forge(page, '4/9');
+  await expect(page.locator('.dialogue')).toContainText('Exact: 0.4444', { timeout: 10_000 });
+  await talk(page);
+
+  // The second phase is a choice: walk to die C and take it.
+  await expect(page.locator('#ask-progress')).toHaveText('* >');
+  await expect(page.locator('#forge-open')).toHaveCount(0);
+  await page.keyboard.down('ArrowUp');
+  await page.waitForTimeout(700);
+  await page.keyboard.up('ArrowUp');
+  await walkRightUntil(page, () => window.__cq.near === 'C');
+  await page.keyboard.press('e');
+  await page.waitForFunction(() => window.__cq.state.solved['c2-intransitive']);
+  expect(await page.evaluate(() => window.__cq.state.mistakes.length)).toBe(0);
+  await talk(page);
+  await page.waitForFunction(() => window.__cq.scene === 'Region');
+
+  expect(errors).toEqual([]);
+});

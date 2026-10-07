@@ -41,7 +41,17 @@ body.playing .hud { display: flex; }
 /* the encounter's question, spoken by the NPC */
 .ask { left: calc(2 * var(--u)); right: calc(2 * var(--u)); bottom: calc(2 * var(--u)); min-height: calc(40 * var(--u)); display: flex; flex-direction: column; justify-content: flex-end; gap: calc(2 * var(--u)); z-index: 10; }
 .ask:empty { display: none; }
-#ui:has(.dialogue) .ask, #ui:has(.forge) .ask { visibility: hidden; } /* one speaker at a time */
+#ui:has(.dialogue) .ask, #ui:has(.forge) .ask, #ui:has(.flask-box) .ask { visibility: hidden; } /* one speaker at a time */
+
+/* Predict: the flask you pour your gut feeling into */
+.flask-box { left: calc(30 * var(--u)); right: calc(30 * var(--u)); bottom: calc(14 * var(--u)); z-index: 35; }
+.flask-box .ask-text { margin: calc(2 * var(--u)) 0; }
+.flask-row { display: flex; gap: calc(8 * var(--u)); margin-top: calc(3 * var(--u)); }
+.flask { width: calc(20 * var(--u)); height: calc(52 * var(--u)); background: #000; border: var(--u) solid var(--ink); border-top: none; display: flex; align-items: flex-end; }
+.potion { width: 100%; background: #ff77a8; }
+.flask-side { flex: 1; display: flex; flex-direction: column; gap: calc(3 * var(--u)); align-items: flex-start; }
+.flask-side input[type=range] { width: 100%; padding: 0; height: calc(8 * var(--u)); accent-color: #ff77a8; }
+.reading { font-size: calc(12 * var(--u)); color: var(--gold); line-height: 1; }
 .ask-story { font-size: calc(5 * var(--u)); color: #c2c3c7; }
 .ask-story b { color: var(--gold); font-weight: normal; }
 .ask-buttons { display: flex; gap: calc(3 * var(--u)); align-items: center; }

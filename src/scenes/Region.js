@@ -20,6 +20,14 @@ import { BOSSES } from '../encounters/index.js';
 const ROWS = 11, T = 16;
 const PORCH_Y = 5 * T;     // feet of things standing on the porch
 const ECHO_Y = 8 * T;      // feet of Echo ghosts
+// What each region's street is painted with: the ground behind the houses,
+// the road, the strip below the road, and the far edge.
+const LOOK = {
+  1: { ground: 'grass', road: 'path', verge: 'grass', edge: 'water', trees: true },  // Tallyburg: a village green
+  2: { ground: 'moss', road: 'moss', verge: 'reeds', edge: 'water', ponds: true },   // Venn Marshes: bog and ponds
+  3: { ground: 'path', road: 'wood', verge: 'water', edge: 'water' },                // Bayesport: a boardwalk over the harbour
+  4: { ground: 'sand', road: 'sand', verge: 'sand', edge: 'path', trees: true },     // Fortune Bazaar: desert market
+};
 const slotCol = i => 4 + i * 3;             // left column of the i-th building
 const slotX = i => (slotCol(i) + 1) * T + 8; // its door, where the owner stands
 
@@ -66,7 +74,7 @@ export default class Region extends Phaser.Scene {
       this.things.push({ kind: 'echo', id: `echo:${id}`, label: `Echo: ${enc.title}`, tex: owner.tex, enc, x: owner.x, y: ECHO_Y });
     }
 
-    this.add.text(4, PORCH_Y - 14, '< map', FONT);
+    this.add.text(4, PORCH_Y - 14, '< map', { ...FONT, backgroundColor: '#000000' });
     this.walker = new Walker(this, x, PORCH_Y + 10);
     this.label = this.add.text(0, 0, '', { ...FONT, backgroundColor: '#000000', padding: { x: 2, y: 2 } }).setOrigin(0.5, 1).setDepth(20);
     this.cameras.main.setBackgroundColor('#29adff').setBounds(0, -2, this.widthPx, 180).startFollow(this.walker.sprite, true);
@@ -86,13 +94,15 @@ export default class Region extends Phaser.Scene {
     const tex = this.textures.createCanvas('street', cols * T, ROWS * T);
     const ctx = tex.getContext();
     const put = (key, c, r) => ctx.drawImage(this.textures.get(key).getSourceImage(), c * T, r * T);
+    const look = LOOK[this.ch] ?? LOOK[1];
     for (let c = 0; c < cols; c++) {
-      for (let r = 0; r <= 3; r++) put('grass', c, r);
+      for (let r = 0; r <= 3; r++) put(look.ground, c, r);
       put('tree', c, 0);
-      for (let r = 4; r <= 8; r++) put('path', c, r);
-      put(c % 3 === 1 ? 'flowers' : 'grass', c, 9);
-      if (c % 5 === 2) put('tree', c, 9);
-      put('water', c, 10);
+      for (let r = 4; r <= 8; r++) put(look.road, c, r);
+      put(look.verge === 'grass' && c % 3 === 1 ? 'flowers' : look.verge, c, 9);
+      if (look.ponds && c % 4 < 2) put('water', c, 9);
+      else if (look.trees && c % 5 === 2) put('tree', c, 9);
+      put(look.edge, c, 10);
     }
     this.things.forEach((thing, i) => {
       const c0 = slotCol(i);

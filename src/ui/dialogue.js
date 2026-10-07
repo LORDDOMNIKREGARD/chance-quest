@@ -44,6 +44,24 @@ export function choose(speaker, text, options) {
   });
 }
 
+/** A one-line question with a text field. Resolves to what was typed, or null if cancelled. */
+export function askValue(label) {
+  return new Promise(resolve => {
+    const field = el('input', { id: 'ask-value', autocomplete: 'off' });
+    const done = value => { pop(); ui.busy--; box.remove(); resolve(value); };
+    const box = mount(el('div', { className: 'box dialogue' },
+      el('div', { className: 'speaker', textContent: label }),
+      el('div', { className: 'row' }, field, el('button', { textContent: 'OK', onclick: () => done(field.value.trim()) }))));
+    field.onkeydown = ev => {
+      if (ev.key === 'Enter') done(field.value.trim());
+      if (ev.key === 'Escape') done(null);
+    };
+    const pop = input.push(action => { if (action === 'menu') done(null); });
+    ui.busy++;
+    field.focus();
+  });
+}
+
 /** The Scroll of Insight: the full worked solution and the pattern to remember. */
 export function showScroll(enc, vars) {
   const body = el('div', {},

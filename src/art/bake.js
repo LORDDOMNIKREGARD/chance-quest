@@ -1,6 +1,6 @@
 // Turns the string grids in sprites.js into Phaser textures at boot.
 import { PALETTE } from './palette.js';
-import { HERO, NPC_GRID, NPC_SWAPS, PROPS, ICONS, TILES, ROOF_SWAPS } from './sprites.js';
+import { HERO, NPC_GRID, NPC_SWAPS, PROPS, ICONS, TILES, ROOF_SWAPS, DIE_PIPS } from './sprites.js';
 
 /**
  * Paint one grid into a new texture called `key`.
@@ -35,4 +35,13 @@ export function bakeAll(scene) {
   bake(scene, 'tile', framed(16, 16, '4', 'f'));
   bake(scene, 'card', framed(12, 16, '5', '7'));
   bake(scene, 'book', framed(10, 16, '5', '7')); // white, so scenes can tint it per subject
+  for (const [value, pips] of Object.entries(DIE_PIPS)) bake(scene, `die_${value}`, dieFace(pips));
+}
+
+/** A 12×12 die face as a grid: white with a grey rim, clipped corners and black 2×2 pips. */
+function dieFace(pips) {
+  const grid = framed(12, 12, '5', '7').map(row => [...row]);
+  for (const [x, y] of [[0, 0], [11, 0], [0, 11], [11, 11]]) grid[y][x] = '.';
+  for (const [px, py] of pips) for (const dy of [0, 1]) for (const dx of [0, 1]) grid[py + dy][px + dx] = '0';
+  return grid.map(row => row.join(''));
 }
