@@ -1,0 +1,101 @@
+/* --u is one game pixel in real pixels (set by main.js when the window resizes).
+   Every size below is written in game pixels × --u, so the HTML layer scales
+   in lock-step with the 320×180 canvas. */
+:root { --u: 1px; --ink: #fff1e8; --navy: #1d2b53; --gold: #ffec27; }
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+body {
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Press Start 2P", monospace; color: var(--ink);
+  user-select: none; -webkit-user-select: none; touch-action: none;
+}
+#stage { position: relative; width: calc(320 * var(--u)); height: calc(180 * var(--u)); }
+#game canvas { display: block; image-rendering: pixelated; }
+#ui { position: absolute; inset: 0; overflow: hidden; pointer-events: none; font-size: calc(6 * var(--u)); line-height: 1.6; }
+#ui > * { position: absolute; pointer-events: auto; box-sizing: border-box; }
+
+.box { background: var(--navy); border: var(--u) solid var(--ink); outline: var(--u) solid #000; padding: calc(3 * var(--u)); }
+.icon { width: calc(8 * var(--u)); height: calc(8 * var(--u)); image-rendering: pixelated; vertical-align: middle; }
+button, input {
+  font: inherit; color: var(--ink); background: #5f574f; border: var(--u) solid #000;
+  padding: calc(1.5 * var(--u)) calc(3 * var(--u)); border-radius: 0;
+}
+button { cursor: pointer; box-shadow: inset calc(-1 * var(--u)) calc(-1 * var(--u)) 0 #0006, inset var(--u) var(--u) 0 #fff3; }
+button:hover, button:focus-visible { background: #ab5236; outline: none; }
+button:disabled { opacity: .4; cursor: default; }
+input { background: #000; user-select: text; -webkit-user-select: text; min-width: 0; }
+
+/* top bar */
+.hud { display: none; top: 0; left: 0; right: 0; height: calc(11 * var(--u)); padding: 0 calc(2 * var(--u)); background: #000b; justify-content: space-between; align-items: center; z-index: 5; }
+body.playing .hud { display: flex; }
+.hud > span { display: flex; align-items: center; gap: calc(1.5 * var(--u)); }
+.hud button { font-size: calc(5 * var(--u)); padding: calc(1 * var(--u)) calc(2 * var(--u)); }
+.badge { background: #7e2553; padding: 0 calc(2 * var(--u)); margin-left: calc(3 * var(--u)); }
+
+/* dialogue + title menu */
+.dialogue { left: calc(4 * var(--u)); right: calc(4 * var(--u)); bottom: calc(4 * var(--u)); min-height: calc(36 * var(--u)); z-index: 40; cursor: pointer; }
+.speaker { color: var(--gold); margin-bottom: calc(2 * var(--u)); }
+.choices { display: flex; gap: calc(4 * var(--u)); margin-top: calc(3 * var(--u)); }
+.title-menu { left: 50%; bottom: calc(14 * var(--u)); transform: translateX(-50%); display: flex; flex-direction: column; gap: calc(3 * var(--u)); }
+.title-menu button { font-size: calc(8 * var(--u)); padding: calc(3 * var(--u)) calc(8 * var(--u)); }
+
+/* the encounter's question, spoken by the NPC */
+.ask { left: calc(2 * var(--u)); right: calc(2 * var(--u)); bottom: calc(2 * var(--u)); min-height: calc(40 * var(--u)); display: flex; flex-direction: column; justify-content: flex-end; gap: calc(2 * var(--u)); z-index: 10; }
+.ask:empty { display: none; }
+#ui:has(.dialogue) .ask, #ui:has(.forge) .ask { visibility: hidden; } /* one speaker at a time */
+.ask-story { font-size: calc(5 * var(--u)); color: #c2c3c7; }
+.ask-story b { color: var(--gold); font-weight: normal; }
+.ask-buttons { display: flex; gap: calc(3 * var(--u)); align-items: center; }
+#ask-progress { margin-left: auto; color: var(--gold); }
+
+/* generic window */
+.panel { left: calc(6 * var(--u)); right: calc(6 * var(--u)); top: calc(13 * var(--u)); bottom: calc(4 * var(--u)); z-index: 30; display: flex; flex-direction: column; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; color: var(--gold); margin-bottom: calc(2 * var(--u)); }
+.panel-body { flex: 1; overflow: auto; min-height: 0; }
+.panel h3 { color: #29adff; font-size: inherit; margin: calc(4 * var(--u)) 0 calc(1 * var(--u)); }
+.panel p, .panel li { margin: calc(2 * var(--u)) 0; }
+.panel ol { padding-left: 0; list-style-position: inside; }
+.row { display: flex; gap: calc(3 * var(--u)); align-items: center; flex-wrap: wrap; margin: calc(2 * var(--u)) 0; }
+.dim { color: #c2c3c7; }
+.parchment { background: #ffccaa; color: #1d2b53; }
+.parchment .panel-head, .parchment h3 { color: #7e2553; }
+
+/* the Chance Forge */
+.forge { left: calc(8 * var(--u)); right: calc(8 * var(--u)); bottom: calc(2 * var(--u)); z-index: 35; background: #5f574f; }
+.forge .ask-text { color: var(--gold); margin-bottom: calc(2 * var(--u)); }
+.crystal { background: #000; border: var(--u) solid #29adff; padding: calc(3 * var(--u)); min-height: calc(18 * var(--u)); display: flex; justify-content: space-between; gap: calc(4 * var(--u)); }
+.crystal .runes { color: #c2c3c7; word-break: break-all; }
+.crystal .value { color: #29adff; text-shadow: 0 0 calc(3 * var(--u)) #29adff; white-space: nowrap; }
+.crystal.crack { border-color: #ff004d; }
+.crystal.crack .value { color: #ff004d; text-shadow: none; white-space: normal; text-align: right; }
+.forge input { width: 100%; box-sizing: border-box; margin: calc(2 * var(--u)) 0; }
+.tiles { display: grid; grid-template-columns: repeat(8, 1fr); gap: var(--u); }
+.tiles button { padding: calc(2.5 * var(--u)) 0; }
+.tiles .strike { background: #ab5236; grid-column: span 2; }
+.shake { animation: shake .25s; }
+@keyframes shake { 25% { transform: translateX(calc(-2 * var(--u))); } 75% { transform: translateX(calc(2 * var(--u))); } }
+
+/* bounty board */
+.posters { display: grid; grid-template-columns: repeat(8, 1fr); gap: calc(2 * var(--u)); }
+.poster { background: #ffccaa; color: #1d2b53; font-size: calc(5 * var(--u)); padding: calc(2 * var(--u)) 0; }
+.poster.trained { background: #29adff; }
+.poster.ok { background: #00e436; }
+.poster.miss { background: #ff77a8; }
+.poster.due { outline: var(--u) dashed var(--ink); }
+
+/* star shrine */
+.shrine .panel-body { display: flex; overflow: hidden; }
+.shrine-wrap { flex: 1; display: flex; gap: calc(3 * var(--u)); min-height: 0; }
+.shrine-col { display: flex; flex-direction: column; gap: calc(1 * var(--u)); min-height: 0; font-size: calc(5 * var(--u)); }
+.shrine-col.side { flex: 1; min-width: 0; }
+.shrine-col .row { margin: 0; }
+.sky { width: calc(200 * var(--u)); height: calc(105 * var(--u)); border: var(--u) solid var(--ink); touch-action: none; cursor: crosshair; flex: none; }
+.card-list { flex: 1; display: flex; flex-direction: column; gap: var(--u); overflow: auto; min-height: 0; }
+.card-list button { font-size: calc(4.5 * var(--u)); text-align: left; }
+.shrine-col > .dim { max-width: calc(200 * var(--u)); }
+
+/* on-screen pad for phones: only while walking around */
+.touch { display: none; z-index: 8; }
+@media (pointer: coarse) { body.world .touch { display: block; } }
+.dpad { left: calc(6 * var(--u)); bottom: calc(6 * var(--u)); width: calc(54 * var(--u)); height: calc(54 * var(--u)); }
+.dpad button, .abtn { position: absolute; width: calc(18 * var(--u)); height: calc(18 * var(--u)); padding: 0; opacity: .7; }
+.abtn { right: calc(10 * var(--u)); bottom: calc(18 * var(--u)); width: calc(24 * var(--u)); height: calc(24 * var(--u)); border-radius: 50%; }
