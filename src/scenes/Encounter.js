@@ -117,6 +117,7 @@ export default class Encounter extends Phaser.Scene {
       const ok = withinTol(forged.value, answer, phase.tol);
       await this.kit.deliver(ok, toy.icon, toy.target);
       if (!ok) {
+        toy.bad?.();
         if (await this.miss(item, ask, forged.expr, forged.value, answer)) continue;
         return false;
       }
@@ -235,7 +236,7 @@ export default class Encounter extends Phaser.Scene {
       const rows = [
         el('div', { className: 'ask-story' }, el('b', { textContent: `${item.enc.title}  ` }), fill(item.enc.story, item.vars)),
         el('div', { className: 'ask-text', textContent: ask }),
-        prc?.run && el('div', { id: 'ask-prc', className: 'ask-story', textContent: `Your gut: ${tidy(prc.gut)}  |  ${prc.run.kept} honest runs: ${tidy(prc.run.mean)}  |  now forge it exactly.` }),
+        prc?.run && el('div', { id: 'ask-prc', className: 'ask-story', textContent: `Gut ${tidy(prc.gut)} | ${prc.run.kept} honest runs: ${tidy(prc.run.mean)} | now forge it.` }), // one line: the toy above needs the room
         el('div', { className: 'ask-buttons' },
           main === 'predict' && button('predict', 'Pour your guess [Enter]', 'predict'),
           main === 'forge' && button('forge-open', 'Forge [Enter]', 'forge'),

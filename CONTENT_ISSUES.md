@@ -38,6 +38,14 @@ No answer value was changed. Everything below is about how the content is stored
 - Some probability asks do not start with "P(" (both `c2-keys` asks put a sentence first). The game decides
   what gets Predict → Run → Compare from the simulation list, not from the wording, so these are covered.
 
+## Scenes pass (7 Oct): what the new charts and experiments assume
+
+- `c4-moments` gives only E[X] and Var(X). Its by-hand experiment needs *some* X, so it uses a fair die
+  shifted and stretched to that mean and variance. The answers hold for every such X; the die is just the toy.
+- Histogram bins are chosen per encounter (`bin` in `src/systems/sims`): e.g. craps is binned by the first
+  roll, *Race of the Sums* by how many rolls it took. They only change what is drawn, never an answer.
+- All 117 phases of Ch 2–4 were forged with their own `f` in the real game (browser test); none was refused.
+
 ## Things to know about the content itself
 
 - `c1-lattice`: `R` and `U` vary on an Echo but the well stays at (2 right, 1 up). Always valid for the given

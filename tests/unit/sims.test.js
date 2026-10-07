@@ -74,6 +74,50 @@ describe('by-hand experiments (knobs and toys)', () => {
   });
 });
 
+describe('what a run shows agrees with what it counts', () => {
+  const all = Object.entries(SIMS).flatMap(([id, sims]) => sims.map((sim, i) => [id, i, sim]).filter(([, , sim]) => sim));
+  const varsOf = (id, sim) => (sim.knob ? { ...byId[id].vars, [sim.knob.name]: sim.knob.min } : byId[id].vars);
+
+  // The by-hand toy picks its chart and its picture from ONE sample run, so every run must report the same fields.
+  it.each(all)('%s phase %i reports the same kind of thing on every run', (id, i, sim) => {
+    const rng = makeRng(11), first = sim.trial(varsOf(id, sim), rng);
+    for (let n = 0; n < 200; n++) {
+      const run = sim.trial(varsOf(id, sim), rng);
+      expect(run.bin === undefined).toBe(first.bin === undefined);
+      expect(run.group === undefined).toBe(first.group === undefined);
+      expect(run.act?.play).toBe(first.act?.play);
+      if (run.bin !== undefined) expect(Number.isFinite(run.bin)).toBe(true);
+    }
+  });
+
+  it('pictures are drawn from the run itself, not made up', () => {
+    const runs = (id, i, check) => { const rng = makeRng(21); for (let n = 0; n < 300; n++) check(simFor(byId[id], i).trial(byId[id].vars, rng)); };
+    runs('c4-arrivals', 1, run => {
+      expect(run.act.times.length).toBe(run.bin);              // one traveller drawn per arrival counted
+      expect(run.act.times.every(t => t > 0 && t <= run.act.minutes)).toBe(true);
+      expect(run.x).toBe(run.bin >= 4);
+    });
+    runs('c4-typos', 0, run => expect(run.act.slips.length).toBe(run.bin));
+    runs('c3-ruin', 0, run => {
+      const { path, top } = run.act;
+      expect(path[0]).toBe(byId['c3-ruin'].vars.i);
+      expect(path.slice(1).every((gold, n) => Math.abs(gold - path[n]) === 1)).toBe(true); // one gold per bet
+      expect(path.slice(0, -1).every(gold => gold > 0 && gold < top)).toBe(true);          // it stops at an edge
+      expect(run.x).toBe(path.at(-1) === top);
+    });
+    runs('c3-duel', 0, run => {
+      expect(run.act.bouts).toMatch(/^-*[WLB]$/);               // misses, then the round somebody is hit
+      expect(run.x).toBe(run.act.bouts.endsWith('L'));          // "only you are hit"
+    });
+    runs('c3-series', 0, run => expect(run.x).toBe(run.act.bouts.endsWith('W'))); // the last bout decides the title
+    runs('c4-roulette-system', 1, run => {
+      const { spins, net } = run.act;
+      expect(net).toBe(spins.reduce((sum, red) => sum + (red ? 1 : -1), 0));
+      expect(run.x).toBe(net);
+    });
+  });
+});
+
 it('1000 trials of every simulation take well under a second each', () => {
   for (const [id, sims] of Object.entries(SIMS)) {
     for (const sim of sims.filter(s => s && s.kind !== 'K')) {

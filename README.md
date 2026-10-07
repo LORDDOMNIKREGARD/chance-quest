@@ -21,8 +21,8 @@ npm run dev
 
 | Command | What it does |
 |---|---|
-| `npm test` | unit tests (evaluator, every content formula, Echo scheduling) |
-| `npm run e2e` | browser smoke test |
+| `npm test` | unit tests (evaluator, every content formula, simulations, Echo scheduling) |
+| `npm run e2e` | browser tests: smoke tests and a full playthrough of chapters 2–4 |
 | `npm run build` | static site in `dist/` |
 | `npm run deploy` | build and publish to GitHub Pages (the `gh-pages` branch) |
 

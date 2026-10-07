@@ -11,6 +11,11 @@
 //     show   little tokens the screen can draw: 'd5' a die, 'sR' a red stone,
 //            'cKS' the king of spades, anything else is shown as text.
 //     group  optional label (which coin? which chest?) for the detective board.
+//     bin    optional: what this run "scored" (the sum of the dice, how many
+//            arrived…). The by-hand toy piles runs up by bin into a histogram.
+//     axis   optional name of what `bin` measures, e.g. 'sum'.
+//     act    optional { play: 'duel' | 'stopwatch' | …, …details }: draw this run
+//            as a small scene instead of tokens (see encounters/pictures.js).
 //
 // Nothing in here knows the exact answer. Run a trial thousands of times and
 // the average of x drifts towards it by itself — that is the Law of Large

@@ -11,8 +11,8 @@ Tallyburg (Ch 1). That is all 98 encounters of your midterm chapters.
 |---|---|
 | `npm install` | once |
 | `npm run dev` | play at http://localhost:5173 |
-| `npm test` | 441 unit tests |
-| `npm run e2e` | 2 browser smoke tests (builds first; uses installed Edge on Windows) |
+| `npm test` | 553 unit tests |
+| `npm run e2e` | 5 browser tests: 2 smoke tests and a full playthrough of Ch 2, 3 and 4 (builds first; uses installed Edge on Windows; about 2 minutes) |
 | `npm run deploy` | build and publish to GitHub Pages |
 
 Keys: WASD/arrows walk · E or Space interact · Enter confirm · H ask Hoot · G Grimoire · M sound · Esc menu/leave.
@@ -21,7 +21,30 @@ Keys: WASD/arrows walk · E or Space interact · Enter confirm · H ask Hoot · 
 console on the title screen and press Continue (it wipes nothing but boss progress):
 `__cq.state.bosses = [1, 2, 3]; __cq.state.where = { scene: 'Overworld' }; localStorage.setItem('chance-quest-save-v1', JSON.stringify(__cq.state)); location.reload()`
 
-## What is new in Milestone 2 — what to try
+## New since Milestone 2: the Ch 2–4 scenes pass (7 Oct) — what to try
+
+The by-hand toy used to show most Ch 2–4 runs as words. Now the latest run is a picture on the left and
+your runs so far build a chart on the right.
+
+1. **Histograms that build themselves.** Wherever a run "scores" something (a sum, a count, a waiting time)
+   each run drops onto its bar: green = the event happened, pink = it did not, grey = thrown away by the
+   condition. Try *Craps in the Cellar* (bars are the first roll), *The Whispered Roll* (everything but one
+   bar is grey: that is what conditioning does), *Gate Arrivals*, *The Third Victory*.
+2. **The expectation is where the pile balances.** For an average the bars are blue and a gold line marks the
+   mean of your runs so far. Try *The Pearl Bet*, *The Red-Bet System*, *Pooled Potions Test*.
+3. **The detective's strings.** In detective cases a red string runs from the clue to each suspect, as thick
+   as that suspect's share of the runs that count; a suspect the clue rules out goes grey. Try *Three Coins
+   in the Box* and *Three Prisoners of the Keep*.
+4. **The stopwatch at the gate** (*Gate Arrivals*): the hand sweeps the window and travellers pop up when
+   they arrive. **The scribe's page** (*The Scribe's Errors*): 500 letters, slips circled in red.
+5. **The duel ground** (all five duel encounters): bouts are pips (green yours, red the rival's), and the last
+   blow is fired. After the forge it plays the verdict: a right answer is your clean hit, a wrong one is the
+   rival's free shot at you.
+6. **The gambler's ledge** (*The Gambler's Ledge*): your gold wanders between the red floor and the green
+   goal. **The wheel** (*The Red-Bet System*) spins once per bet.
+7. *The Moment Scale* now has an experiment too (a rescaled die with the given mean and variance).
+
+## What was new in Milestone 2 — what to try
 
 1. **Predict → Run → Compare.** Any probability or expectation question now starts with "Pour your guess":
    set the flask to your gut feeling (no calculating). The game then really plays the situation 2,000 times
@@ -55,11 +78,16 @@ the Star Shrine, save export/import.
   phases of Ch 2–4 (90 probabilities, 12 expectations) never sees the answer; a test runs each 30,000 times
   and requires the average to land on the stored answer (and again after Echo re-rolls). All pass.
   Of the other 15 phases, 3 are knob puzzles, 2 are by-hand only, and 10 have nothing to simulate.
-- 441/441 unit tests; both browser tests pass with zero console errors. The second one plays a full
-  Predict → Run → Compare and a walk-to choice.
+- 553/553 unit tests; all five browser tests pass with zero console errors.
+- **Every one of the 74 Ch 2–4 encounters and all three new boss fights have now been played to the end** by
+  `tests/e2e/playthrough.spec.js`: it tries each toy by hand, pours a guess, waits for the Run, forges the
+  content's own formula and walks to the choices. All 117 phases were accepted with no mistakes logged.
+- The pictures only show what the trial decided (a unit test checks stopwatch, page, ledge, duel and wheel
+  against the run they draw).
 - By hand in the browser: card, dice and stone experiments, the knob toy, Venn ponds, crowd grid, tree,
   detective pins, flask, run board, compare line, and the pedestal choice.
-- Not played through by hand: every one of the 74 new encounters end to end, and the three new boss fights.
+- Not done by a human: the playthrough above is a script. It proves the game can be finished; it cannot say
+  whether a toy *teaches* well. That needs your eyes.
 
 ## Not in this milestone
 
@@ -69,13 +97,16 @@ the Star Shrine, save export/import.
 
 ## Known issues
 
-- **The by-hand toy is the same viewer for most Ch 2–4 templates.** Dice, cards and stones are drawn properly,
-  but a duel, a fishing dock and a market stall all show their outcome as words ("round 2: he hits you")
-  rather than as an animated scene. The spec's per-template flourishes (stopwatch at the dock, duel animation
-  after the forge, evidence strings on the detective board) are not built.
-- A very long story (e.g. *Three Guilds*) makes the question box tall enough to cover the last line of the toy.
-- Phases that are pure algebra or a count (*The Moment Scale*, *The Balanced Academy*, the first two Three
-  Guilds questions) have no experiment; their toy is just "think it through".
+- Card hands, urns and the remaining word-only runs (*The Queen's Secret*, *The Bridge Circuit*) are still tokens and
+  words with no scene of their own. The market stall's "EV meter" is the gold average line on its histogram,
+  not a separate instrument.
+- A histogram bar that collects stragglers (20 or more rolls) is labelled with the plain number, not "20+".
+- *The Balanced Academy* and the first question of *Reverse Engineering* still have no experiment; their toy
+  is "think it through".
+- The by-hand toy now stays above the question box even for the longest stories. Only *Pooled Potions Test*
+  is long enough for the box to reach the bar labels once the "Gut | runs" line is showing.
+- In the small story text at some window sizes an "8" can look like "&" (the pixel font at a non-whole
+  scale). It was already so; the forge shows the same story larger.
 - The dialogue, forge and panels are HTML over the canvas rather than in-canvas pixel sprites.
 - Star Shrine cards are clicked to add, then dragged on the sky.
 - The forge accepts an encounter's variable names (e.g. `p*s/(p*s+(1-p)*fp)`).

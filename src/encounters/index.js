@@ -20,7 +20,8 @@ const plain = k => {
 };
 
 /**
- * Build the toy for one phase. Returns { icon, target, ok? }.
+ * Build the toy for one phase. Returns { icon, target, ok?, bad? }:
+ * the forged thing flies to `target`, then ok() or bad() lets the toy react.
  * From Chapter 2 on, the default toy is the phase's own experiment run by
  * hand; a few templates have something more specific.
  */

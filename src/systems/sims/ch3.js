@@ -22,25 +22,28 @@ function pouch(v, r, draws) {
 }
 // The jailer names one of B, C who stays free (at random if both do).
 const jail = r => { const exiled = r.pick('ABC'); return { exiled, says: exiled === 'A' ? r.pick('BC') : exiled === 'B' ? 'C' : 'B' }; };
-// A first-to-four series.
+// A first-to-four series. `chart` is how every phase of it is drawn.
 function series(v, r) {
   const bouts = [];
   while (bouts.filter(b => b === 'W').length < 4 && bouts.filter(b => b === 'L').length < 4) bouts.push(r.chance(v.p) ? 'W' : 'L');
-  return bouts;
+  return { bouts, chart: { show: bouts, bin: bouts.length, axis: 'bouts', act: { play: 'duel', bouts: bouts.join('') } } };
 }
 // Both fire each round until somebody is hit.
 function duel(v, r) {
   let rounds = 0, youHit, heHits;
   do { rounds++; youHit = r.chance(v.a); heHits = r.chance(v.b); } while (!youHit && !heHits);
-  return { rounds, youHit, heHits, show: [`round ${rounds}:`, youHit && heHits ? 'both hit' : youHit ? 'you hit him' : 'he hits you'] };
+  // For the picture: '-' a round where both miss, then W (only you hit), L (only he hits) or B (both).
+  const bouts = '-'.repeat(rounds - 1) + (youHit && heHits ? 'B' : youHit ? 'W' : 'L');
+  const chart = { bin: Math.min(rounds, 8), axis: 'rounds', act: { play: 'duel', bouts } };
+  return { rounds, youHit, heHits, chart, show: [`round ${rounds}:`, youHit && heHits ? 'both hit' : youHit ? 'you hit him' : 'he hits you'] };
 }
 const herb = (v, r) => { const watered = r.chance(v.w); return { watered, dead: r.chance(watered ? v.d2 : v.d1) }; };
 const coinPick = (v, r) => { const p = r.pick([v.p1, v.p2]); return { p, twoHeads: r.chance(p) && r.chance(p) }; };
 
 export default {
   'c3-dice-given': [
-    P((v, r) => { const d = twoDice(r); return { x: d[0] === d[1] ? null : d.includes(6), show: dice(d) }; }),
-    P((v, r) => { const d = twoDice(r); return { x: d[0] + d[1] !== 9 ? null : d[0] === 6, show: dice(d) }; }),
+    P((v, r) => { const d = twoDice(r); return { x: d[0] === d[1] ? null : d.includes(6), show: dice(d), bin: d[0] + d[1], axis: 'sum' }; }),
+    P((v, r) => { const d = twoDice(r); return { x: d[0] + d[1] !== 9 ? null : d[0] === 6, show: dice(d), bin: d[0] + d[1], axis: 'sum' }; }),
   ],
   'c3-chain-draws': [P((v, r) => {
     const got = r.draw(bag({ W: v.w, K: v.b }), 4);
@@ -91,25 +94,27 @@ export default {
     const on = [v.p1, v.p2, v.p3].map(p => r.chance(p));
     return { x: on[0] && (on[1] || on[2]), show: on.map((works, i) => `gate ${i + 1} ${works ? 'on' : 'off'}`) };
   })],
-  'c3-k-of-n': [P((v, r) => { const working = r.count(v.n, v.p); return { x: working >= v.k, show: [`${working} of ${v.n} wards hold`] }; })],
+  'c3-k-of-n': [P((v, r) => { const working = r.count(v.n, v.p); return { x: working >= v.k, show: [`${working} of ${v.n} wards hold`], bin: working, axis: 'wards holding' }; })],
   'c3-series': [
-    P((v, r) => { const bouts = series(v, r); return { x: bouts.filter(b => b === 'W').length === 4, show: bouts }; }),
-    P((v, r) => { const bouts = series(v, r); return { x: bouts.length === 7, show: bouts }; }),
+    P((v, r) => { const s = series(v, r); return { x: s.bouts.filter(b => b === 'W').length === 4, ...s.chart }; }),
+    P((v, r) => { const s = series(v, r); return { x: s.bouts.length === 7, ...s.chart }; }),
   ],
   'c3-duel': [
-    P((v, r) => { const d = duel(v, r); return { x: d.heHits && !d.youHit, show: d.show }; }),
-    P((v, r) => { const d = duel(v, r); return { x: d.rounds === 3, show: d.show }; }),
+    P((v, r) => { const d = duel(v, r); return { x: d.heHits && !d.youHit, show: d.show, ...d.chart }; }),
+    P((v, r) => { const d = duel(v, r); return { x: d.rounds === 3, show: d.show, ...d.chart }; }),
   ],
   'c3-alternate-dice': [P((v, r) => {
     for (let turn = 1; ; turn++) { // you roll, then the ferryman, until someone gets their sum
-      if (r.die() + r.die() === 8) return { x: true, show: [`your 8 on turn ${turn}`] };
-      if (r.die() + r.die() === 7) return { x: false, show: [`his 7 on turn ${turn}`] };
+      const chart = { bin: Math.min(turn, 10), axis: 'turns' };
+      if (r.die() + r.die() === 8) return { x: true, show: [`your 8 on turn ${turn}`], ...chart };
+      if (r.die() + r.die() === 7) return { x: false, show: [`his 7 on turn ${turn}`], ...chart };
     }
   })],
   'c3-ruin': [P((v, r) => {
-    let gold = v.i, bets = 0;
-    while (gold > 0 && gold < v.N) { gold += r.chance(v.p) ? 1 : -1; bets++; }
-    return { x: gold === v.N, show: [`${bets} bets:`, gold ? `reached ${v.N}` : 'broke'] };
+    const path = [v.i]; // your gold after every bet
+    while (path.at(-1) > 0 && path.at(-1) < v.N) path.push(path.at(-1) + (r.chance(v.p) ? 1 : -1));
+    const gold = path.at(-1), bets = path.length - 1;
+    return { x: gold === v.N, show: [`${bets} bets:`, gold ? `reached ${v.N}` : 'broke'], act: { play: 'ledge', path, top: v.N } };
   })],
   'c3-carrier': [P((v, r) => {
     const cursed = r.chance(0.5);
@@ -131,7 +136,7 @@ export default {
   ],
   'c3-odds': [T((v, r) => { const wins = r.chance(3 / 8); return { x: wins, show: [wins ? 'rider wins' : 'rider loses'] }; })],
   'c3-friend-cards': [
-    P((v, r) => { const h = r.draw(DECK, 2), aces = h.filter(c => rank(c) === 0).length; return { x: aces ? aces === 2 : null, show: h.map(card) }; }),
-    P((v, r) => { const h = r.draw(DECK, 2), aces = h.filter(c => rank(c) === 0).length; return { x: h.includes(0) ? aces === 2 : null, show: h.map(card) }; }), // card 0 is the ace of spades
+    P((v, r) => { const h = r.draw(DECK, 2), aces = h.filter(c => rank(c) === 0).length; return { x: aces ? aces === 2 : null, show: h.map(card), bin: aces, axis: 'aces' }; }),
+    P((v, r) => { const h = r.draw(DECK, 2), aces = h.filter(c => rank(c) === 0).length; return { x: h.includes(0) ? aces === 2 : null, show: h.map(card), bin: aces, axis: 'aces' }; }), // card 0 is the ace of spades
   ],
 };

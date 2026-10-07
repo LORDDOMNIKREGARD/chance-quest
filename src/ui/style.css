@@ -52,7 +52,8 @@ body.playing .hud { display: flex; }
 .flask-side { flex: 1; display: flex; flex-direction: column; gap: calc(3 * var(--u)); align-items: flex-start; }
 .flask-side input[type=range] { width: 100%; padding: 0; height: calc(8 * var(--u)); accent-color: #ff77a8; }
 .reading { font-size: calc(12 * var(--u)); color: var(--gold); line-height: 1; }
-.ask-story { font-size: calc(5 * var(--u)); color: #c2c3c7; }
+/* At most five lines of story (a longer one would scroll), so the box never climbs far over the toy above it. */
+.ask-story { font-size: calc(5 * var(--u)); color: #c2c3c7; max-height: calc(40 * var(--u)); overflow-y: auto; scrollbar-width: thin; }
 .ask-story b { color: var(--gold); font-weight: normal; }
 .ask-buttons { display: flex; gap: calc(3 * var(--u)); align-items: center; }
 #ask-progress { margin-left: auto; color: var(--gold); }
