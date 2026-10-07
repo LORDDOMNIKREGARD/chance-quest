@@ -11,7 +11,6 @@
 // systems/sim.js), draw() repaints.
 import { FONT } from './kit.js';
 
-const tidy = x => String(+Number(x).toPrecision(4));
 const GREEN = 0x00e436, PINK = 0xff77a8, GREY = 0x5f574f, BLUE = 0x29adff, GOLD = 0xffec27, RED = 0xff004d;
 const DIM = { ...FONT, color: '#c2c3c7' };
 
@@ -59,7 +58,7 @@ export function histogram(k, { x, y, w, h }, sim, axis = '') {
       const pitch = Math.min(18, w / slots);
       const wide = Math.max(2, Math.floor(pitch) - 1);
       const xOf = key => x + Math.round(slotOf(key) * pitch);
-      const name = key => (words ? String(key) : tidy(key));
+      const name = key => (words || Number.isInteger(key) ? String(key) : String(+key.toPrecision(3))); // short, so names fit under bars
 
       const tallest = Math.max(...[...piles.values()].map(pile => pile[0] + pile[1] + pile[2]));
       const unit = Math.min(4, TALL / tallest); // 4 pixels a run, until the tallest pile reaches the top

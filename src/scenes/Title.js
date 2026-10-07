@@ -27,7 +27,9 @@ export default class Title extends Phaser.Scene {
     const menu = mount(el('div', { className: 'title-menu' },
       el('button', { id: 'new-game', textContent: 'New Game', onclick: () => this.newGame(menu) }),
       hasSave() && el('button', { id: 'continue', textContent: 'Continue', onclick: () => this.enterWorld(state.where) }),
-      el('button', { id: 'import-title', textContent: 'Import Save', onclick: () => pickSave(message => { note.textContent = message; }) }),
+      el('div', { className: 'title-row' },
+        el('button', { id: 'versus', textContent: 'Versus', onclick: () => this.scene.start('Versus') }),
+        el('button', { id: 'import-title', textContent: 'Import Save', onclick: () => pickSave(message => { note.textContent = message; }) })),
       note));
     this.events.once('shutdown', () => menu.remove());
   }

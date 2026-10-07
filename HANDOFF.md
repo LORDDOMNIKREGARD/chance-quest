@@ -40,7 +40,25 @@ Ch 1–4 around 21 Oct 2026, who is also learning JavaScript — so code must st
 12. Each milestone ends with an updated `PLAYTEST.md` (what to try, known issues, content issues).
 13. Keep this file current, so a fresh tab can always pick the work up.
 
-## State of the work (7 Oct 2026)
+## State of the work (7 Oct 2026, second session)
+
+- **Ch 2–4 scenes pass: done.** The owner chose this over starting M3 (midterm first). Commit `9fb1669`.
+  - `src/encounters/pictures.js`: the latest by-hand run as a small scene — stopwatch window, page of 500
+    letters, duel ground (which also plays the forge's verdict through the toy's new `ok()` / `bad()`),
+    gambler's ledge, roulette wheel. A trial asks for one with `act: { play: '…' }`.
+  - `src/encounters/charts.js`: a chart of all by-hand runs — a histogram (the trial reports `bin` + `axis`;
+    green/pink/grey stacks; a gold average line for E and T kinds, which need no `bin`) or the detective's
+    strings (the trial reports `group`). `experiment.js` picks picture and chart from one sample run.
+  - `tests/e2e/playthrough.spec.js` plays all 74 Ch 2–4 encounters and the 3 boss fights to the end.
+  - The toy area now ends at y = 98, and the question box's story is capped at five lines.
+- **Versus: done** (the owner asked for it mid-session: "a versus mode, online if you can, with a timer").
+  `src/scenes/Versus.js` (lobby, duel, result), `src/systems/versus.js` (the rule book: seeded questions,
+  cleaning of whatever the other browser sends, the verdict), `src/systems/net.js` (PeerJS link, loaded on demand).
+- **Tests now:** 560 unit tests, 6 Playwright tests + 1 that needs `ONLINE=1`. All passing, zero console errors.
+- **Pushed and deployed?** Check with `git log origin/main..main` (empty = pushed) and the live URL.
+
+Earlier:
+
 
 - **M1 (Ch 1 Tallyburg): done, pushed, live.** Engine, overworld, forge + evaluator, 11 counting toys, Hoot,
   Scroll, Grimoire + Markdown export, Echoes, Bounty Board, Star Shrine, boss, save export/import.
@@ -58,17 +76,15 @@ Ch 1–4 around 21 Oct 2026, who is also learning JavaScript — so code must st
 
 ## What to do next
 
-**The owner has not yet answered this question — ask it first:**
-start Milestone 3 (Ch 5–8), or first give the Ch 2–4 templates their own scenes (their midterm chapters)?
+**Stop for the owner's review first** (standing instruction 1): they have not yet played the scenes pass or
+Versus. Ask what they found, then ask whether to start Milestone 3.
 
-Known gaps in M2, biggest first (also in `PLAYTEST.md`):
-1. Most Ch 2–4 templates share one by-hand viewer. A duel, a fishing dock, a market stall show outcomes as
-   words. The spec wanted per-template interaction: stopwatch window at the dock (Poisson arrivals), a duel
-   animated after the forge with the rival getting a free shot on a miss, evidence strings on the detective
-   board, an EV meter at the market stall, a roulette wheel / random-walk ledge, a dice histogram.
-2. Not played by hand: all 74 new encounters end to end, and the three new boss fights.
-3. A very long story (Three Guilds) makes the question box cover the last line of the toy.
-4. Pure-algebra phases have a "think it through" placeholder toy.
+What is still open in Ch 1–4 (also in `PLAYTEST.md`):
+1. Card hands, urns and a few word-only runs (*The Queen's Secret*, *The Bridge Circuit*) have no scene.
+2. *The Balanced Academy* and the first question of *Reverse Engineering* have no experiment.
+3. Versus was only tried between two browser sessions on one machine. Ask the owner how a real duel between
+   two networks went. If the public PeerJS broker is unreliable: run a PeerServer and pass it to `new Peer`.
+4. Nobody human has judged whether the new pictures *teach*. The playthrough test only proves they run.
 
 **M3 (Ch 5–8), when asked:** sims for Ch 5–8 (same pattern; continuous variables need `r.u()`-based
 sampling, normals via Box–Muller); the Φ-Scroll (z-table item; normal phases already have a looser
@@ -85,7 +101,7 @@ mute), something to spend gold on (cosmetics, hint refills).
 |---|---|
 | `npm run dev` | play locally at http://localhost:5173 |
 | `npm test` | unit tests (evaluator, every content formula, sims vs answers, Echo scheduling) |
-| `npm run e2e` | Playwright smoke tests; builds first; uses installed Edge on Windows |
+| `npm run e2e` | Playwright tests (smoke, full Ch 2–4 playthrough, practice duel); builds first; uses installed Edge on Windows. `ONLINE=1` adds the online duel (PowerShell: `$env:ONLINE = 1`) |
 | `npm run build` | static `dist/` |
 | `npm run deploy` | build and force-push `dist/` to `gh-pages` |
 | `npm run content` | rebuild `public/content.json` from `content-src/ch1..8.json` (bounties are generated) |
@@ -95,20 +111,23 @@ mute), something to spend gold on (cosmetics, hint refills).
 - `src/main.js` — Phaser game at 320×180, integer zoom; sets CSS `--u` (one game pixel) for the HTML layer.
 - `src/scenes/` — `Boot`, `Title`, `Overworld` (one-screen map, 8 gates), `Region` (one long street per
   chapter; `LOOK` sets its tiles), `Encounter` (plays every encounter; modes normal / echo / boss),
-  `walker.js` (hero movement).
+  `Versus` (timed duel, online or alone), `walker.js` (hero movement).
 - `src/encounters/` — toys. `index.js` routes an encounter to its toy (`buildToy`) and holds `FLAVOUR`,
   `BOSSES`, `BUILT_CHAPTERS`. `kit.js` is the toolbox every toy is built from. Ch 1 toys: `rows.js`,
-  `counting.js`, `grouping.js`, `arrange.js`. A toy returns `{ icon, target, ok? }`.
+  `counting.js`, `grouping.js`, `arrange.js`. Ch 2–4: `experiment.js` (the by-hand toy) with `pictures.js`
+  and `charts.js`. A toy returns `{ icon, target, ok?, bad? }`.
 - `src/systems/` — `evaluator.js` (forge expression language, no eval), `content.js`, `save.js`
   (localStorage, `window.__cq` debug handle), `srs.js` (Leitner 1/3/7/21 days), `grimoire.js`, `input.js`
-  (held directions + an action-handler stack), `sim.js` + `sims/`.
+  (held directions + an action-handler stack), `sim.js` + `sims/`, `versus.js` (duel rules), `net.js` (PeerJS).
 - `src/ui/` — HTML layer over the canvas: `dialogue.js` (`say`, `choose`, `askValue`, `showScroll`),
   `forge.js`, `flask.js`, `hud.js`, `grimoire.js`, `bounty.js`, `shrine.js`, `style.css`, `dom.js`.
 - `src/art/` — sprites as string grids (PICO-8 palette), baked to textures at boot. `src/audio/sfx.js` — WebAudio.
 
 How a simulation is declared (`sims/chN.js`): one entry per phase, `P(trial)` probability, `E(lo, hi, trial)`
 expectation, `K(name, min, max, trial)` knob puzzle, `T(trial)` by-hand only, `null` nothing to simulate.
-A trial is `(vars, rng) => ({ x, show, group })`; `x: null` means "condition not met, discard".
+A trial is `(vars, rng) => ({ x, show, group?, bin?, axis?, act? })`; `x: null` means "condition not met,
+discard". `bin`/`axis` feed the histogram, `group` the detective strings, `act` asks for a picture. Every run
+of one trial must report the same fields (a unit test checks it).
 
 ## Decisions made along the way (and why)
 
@@ -122,7 +141,28 @@ A trial is `(vars, rng) => ({ x, show, group })`; `x: null` means "condition not
 - **Deploy is a script, not a GitHub Action**: fewer moving parts. Pushing `main` does not redeploy.
 - **Playwright drives installed Edge on Windows** instead of downloading Chromium (`PW_CHANNEL` overrides).
 
+- **Versus breaks two of the spec's rules on purpose, because the owner asked for it**: it has a clock, and it
+  shows a score. It is fenced off: its own scene, reached from the title screen, never touching the save. The
+  adventure still never times a calculation.
+- **Online play uses PeerJS's free public broker** (one new dependency, in its own lazily loaded chunk, so
+  the adventure does not pay for it). No server of ours. Everything received from the other browser goes
+  through `cleanRules` / `cleanScore`.
+- **Charts are chosen from one sample run** of the trial (`experiment.js`), not declared per encounter.
+- **Push and deploy:** the second session asked the owner in chat before pushing and deploying (publishing
+  needs a yes from the person in the conversation, not from this file). Ask once, then do both yourself.
+
 ## Things that will save you time
+
+- **Looking at the game from a script:** the app's preview pane may be hidden, and then the game's frame
+  clock stops. Screenshots from a throw-away Playwright script are more reliable:
+  `import { chromium } from '@playwright/test'`, `chromium.launch({ channel: 'msedge' })`, open the dev
+  server, `page.screenshot`. Tweens run on real time (`scene.tweens.timeScale = 20` hurries them, and
+  `scene.time.timeScale` the delayed calls) — that is how the playthrough test finishes in a minute.
+- **Start any encounter from a script** the way the game does: `const r = __cq.game.scene.getScene('Region');
+  r.interact(r.things.find(t => t.id === 'c4-arrivals'))` (with a save that stands in that region).
+- **Port 5173 may be taken** by another session's dev server; `npm run dev -- --port 5183` is fine.
+- If the project folder ever holds only a `.git` folder whose `HEAD` says `refs/heads/.invalid`, a clone was
+  interrupted: set `remote.origin.fetch`, `git fetch origin`, `git checkout -B main --track origin/main`.
 
 - **Players' saves** live in each player's browser (localStorage key `chance-quest-save-v1`); no accounts,
   nothing sent to GitHub. Menu → Export save / Import Save moves a save between devices. New fields must have

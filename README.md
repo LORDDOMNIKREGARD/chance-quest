@@ -10,6 +10,9 @@ Chapters 1–4 are playable: Tallyburg (counting), Venn Marshes (axioms), Bayesp
 and Fortune Bazaar (discrete random variables). Chapters 5–8 are still to come. See
 [PLAYTEST.md](PLAYTEST.md) for what to try.
 
+**Versus:** from the title screen, race a friend online through the same questions against the same clock
+(or practise alone). One of you hosts and shares a five-letter code.
+
 Your progress saves itself in your browser. Use Menu → Export save to back it up or move it to another device.
 
 ## Run it locally
@@ -26,7 +29,7 @@ npm run dev
 | `npm run build` | static site in `dist/` |
 | `npm run deploy` | build and publish to GitHub Pages (the `gh-pages` branch) |
 
-Built with Vite and Phaser 3 in plain JavaScript. All art and sound are generated in code.
+Built with Vite and Phaser 3 in plain JavaScript; online duels use PeerJS (WebRTC). All art and sound are generated in code.
 
 The encounters are original problems; the game references book problem numbers only and contains no text
 from the book.

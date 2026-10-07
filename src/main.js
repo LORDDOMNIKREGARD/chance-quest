@@ -10,6 +10,7 @@ import Title from './scenes/Title.js';
 import Overworld from './scenes/Overworld.js';
 import Region from './scenes/Region.js';
 import Encounter from './scenes/Encounter.js';
+import Versus from './scenes/Versus.js';
 
 const WIDTH = 320, HEIGHT = 180;
 const bestZoom = () => Math.max(1, Math.floor(Math.min(innerWidth / WIDTH, innerHeight / HEIGHT)));
@@ -25,7 +26,7 @@ const game = new Phaser.Game({
   roundPixels: true,
   backgroundColor: '#000000',
   scale: { mode: Phaser.Scale.NONE, zoom: bestZoom() },
-  scene: [Boot, Title, Overworld, Region, Encounter],
+  scene: [Boot, Title, Overworld, Region, Encounter, Versus],
 });
 
 ui.root = document.getElementById('ui');

@@ -11,8 +11,8 @@ Tallyburg (Ch 1). That is all 98 encounters of your midterm chapters.
 |---|---|
 | `npm install` | once |
 | `npm run dev` | play at http://localhost:5173 |
-| `npm test` | 553 unit tests |
-| `npm run e2e` | 5 browser tests: 2 smoke tests and a full playthrough of Ch 2, 3 and 4 (builds first; uses installed Edge on Windows; about 2 minutes) |
+| `npm test` | 560 unit tests |
+| `npm run e2e` | 6 browser tests: 2 smoke tests, a full playthrough of Ch 2, 3 and 4, and a practice duel (builds first; uses installed Edge on Windows; about 2 minutes). A 7th, the online duel, runs only with `ONLINE=1` set, because it needs the internet |
 | `npm run deploy` | build and publish to GitHub Pages |
 
 Keys: WASD/arrows walk · E or Space interact · Enter confirm · H ask Hoot · G Grimoire · M sound · Esc menu/leave.
@@ -20,6 +20,25 @@ Keys: WASD/arrows walk · E or Space interact · Enter confirm · H ask Hoot · 
 **To reach Ch 2–4 you must beat each previous boss.** To jump ahead while testing, paste this in the browser
 console on the title screen and press Continue (it wipes nothing but boss progress):
 `__cq.state.bosses = [1, 2, 3]; __cq.state.where = { scene: 'Overworld' }; localStorage.setItem('chance-quest-save-v1', JSON.stringify(__cq.state)); location.reload()`
+
+## New: Versus (7 Oct) — what to try
+
+Title screen → **Versus**. You and a rival forge the same questions, with the same re-rolled numbers, against
+the same clock (2, 3 or 5 minutes). Every exact answer is a hit on the rival; a wrong one is their free shot
+at you. Most hits wins; with equal hits, fewer misses wins.
+
+1. **Practise alone** first: pick the chapters (all four are on; click one to switch it off) and the clock.
+   Esc, or the skip button next to your score, passes on a question.
+2. **Online:** one of you clicks *Host a duel* and reads out the five-letter room code; the other types it and
+   clicks *Join*. The duel starts by itself. Your rival's hits appear on your screen as they land.
+3. This is the only place in the game with a clock. The adventure still never times a calculation, and a duel
+   does not touch your saved journey, hearts, gold or Grimoire.
+
+What to know about online play: the two browsers connect directly (WebRTC) and a free public service, PeerJS,
+only introduces them. No account, nothing stored. It was tested between two browser sessions on one computer
+through that public service; **it has not been tested between two different networks**, and a strict school
+or office network can block it. If *Join* says no duel is waiting, the host's room was not ready yet: click
+*Join* again.
 
 ## New since Milestone 2: the Ch 2–4 scenes pass (7 Oct) — what to try
 
@@ -78,7 +97,8 @@ the Star Shrine, save export/import.
   phases of Ch 2–4 (90 probabilities, 12 expectations) never sees the answer; a test runs each 30,000 times
   and requires the average to land on the stored answer (and again after Echo re-rolls). All pass.
   Of the other 15 phases, 3 are knob puzzles, 2 are by-hand only, and 10 have nothing to simulate.
-- 553/553 unit tests; all five browser tests pass with zero console errors.
+- 560/560 unit tests; all seven browser tests pass with zero console errors (the seventh is the online duel:
+  two separate browser sessions, one room, the same question on both screens, each seeing the other's score).
 - **Every one of the 74 Ch 2–4 encounters and all three new boss fights have now been played to the end** by
   `tests/e2e/playthrough.spec.js`: it tries each toy by hand, pours a guess, waits for the Run, forges the
   content's own formula and walks to the choices. All 117 phases were accepted with no mistakes logged.
@@ -97,6 +117,8 @@ the Star Shrine, save export/import.
 
 ## Known issues
 
+- Versus: a wrong answer clears what you typed. There is no rematch that keeps the room (another duel means
+  a new code), and nothing stops a rival from simply being quicker with a calculator.
 - Card hands, urns and the remaining word-only runs (*The Queen's Secret*, *The Bridge Circuit*) are still tokens and
   words with no scene of their own. The market stall's "EV meter" is the gold average line on its histogram,
   not a separate instrument.

@@ -37,6 +37,8 @@ body.playing .hud { display: flex; }
 .choices { display: flex; gap: calc(4 * var(--u)); margin-top: calc(3 * var(--u)); }
 .title-menu { left: 50%; bottom: calc(14 * var(--u)); transform: translateX(-50%); display: flex; flex-direction: column; gap: calc(3 * var(--u)); }
 .title-menu button { font-size: calc(8 * var(--u)); padding: calc(3 * var(--u)) calc(8 * var(--u)); }
+.title-row { display: flex; gap: calc(3 * var(--u)); }
+.title-row button { flex: 1; font-size: calc(6 * var(--u)); padding: calc(3 * var(--u)) calc(4 * var(--u)); white-space: nowrap; }
 
 /* the encounter's question, spoken by the NPC */
 .ask { left: calc(2 * var(--u)); right: calc(2 * var(--u)); bottom: calc(2 * var(--u)); min-height: calc(40 * var(--u)); display: flex; flex-direction: column; justify-content: flex-end; gap: calc(2 * var(--u)); z-index: 10; }
@@ -84,6 +86,15 @@ body.playing .hud { display: flex; }
 .tiles .strike { background: #ab5236; grid-column: span 2; }
 .shake { animation: shake .25s; }
 @keyframes shake { 25% { transform: translateX(calc(-2 * var(--u))); } 75% { transform: translateX(calc(2 * var(--u))); } }
+
+/* versus: the forge stays below the arena strip (clock and scores); a long story scrolls, the runes are a little tighter */
+body.versus .forge { max-height: calc(156 * var(--u)); display: flex; flex-direction: column; }
+body.versus .forge > * { flex-shrink: 0; }
+body.versus .forge > .ask-story { flex-shrink: 1; min-height: calc(8 * var(--u)); }
+body.versus .tiles button { padding: calc(1.5 * var(--u)) 0; }
+body.versus .crystal { min-height: calc(12 * var(--u)); }
+.versus button.on { background: #008751; }
+#versus-code { width: calc(40 * var(--u)); text-transform: uppercase; }
 
 /* bounty board */
 .posters { display: grid; grid-template-columns: repeat(8, 1fr); gap: calc(2 * var(--u)); }

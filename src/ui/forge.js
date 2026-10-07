@@ -20,6 +20,9 @@ export const runes = text => text
   .replace(/\*/g, '×').replace(/\//g, '÷')
   .replace(/sqrt/g, '√').replace(/sum/g, 'Σ').replace(/Phi/g, 'Φ');
 
+/** Close an open forge from outside, as if the player had stepped away (the versus clock ran out). */
+export const closeForge = () => document.getElementById('forge-input')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
 /**
  * Open the forge. Resolves to { expr, value } when the player strikes a
  * valid expression, or null if they step away (Esc).
